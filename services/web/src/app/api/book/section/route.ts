@@ -1,11 +1,17 @@
 import type { NextRequest } from 'next/server';
 
+import { requireSession } from '@/lib/api/auth-guards';
 import { apiError } from '@/lib/api/response';
 import { getBookSectionsCollection } from '@/lib/db/collections';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
+  const { session } = await requireSession(request);
+  if (!session) {
+    return apiError('unauthorized', 'Not authenticated', 401);
+  }
+
   const slug = request.nextUrl.searchParams.get('slug');
   if (!slug) {
     return apiError('invalid_request', 'slug is required', 400);
