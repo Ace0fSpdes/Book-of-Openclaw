@@ -315,13 +315,14 @@ async function probeGateway() {
     });
 
     const done = (ok) => {
-      try { sock.destroy(); } catch {}
+      sock.destroy();
       resolve(ok);
     };
 
-    sock.on("connect", () => done(true));
-    sock.on("timeout", () => done(false));
-    sock.on("error", () => done(false));
+    sock
+      .once("connect", () => done(true))
+      .once("timeout", () => done(false))
+      .once("error", () => done(false));
   });
 }
 
